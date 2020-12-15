@@ -1,0 +1,277 @@
+%-----------------------------------------------------------------------------%
+% В отличии от классического TeX использует кодировку UTF-8 для входных файлов,
+% что позволяет не заботиться о выборе нужной кодировки и свободно использовать
+% спецсимволы и символы иностранных языков доступные в Unicode. XeLaTeX генерирует
+% на выходе PDF минуя стадию DVI. Он поддерживает шрифты в форматах TrueType,
+% OpenType и AAT, что позволяет использовать в документе большинство современных шрифтов.
+%----------------------------------------------------------------------------%
+
+% Ипспользуем тип article, шрифт 14pt
+\documentclass[a4paper,14pt,oneside]{extarticle}
+
+% Пакет xltxtra выполняет основные настройки XeLaTeX и загружает пакет fontspec
+% необходимый для управления шрифтами. Команда defaultfontfeatures задает
+% использование традиционных лигатур. Команды серии set...font задают шрифты документа.
+\usepackage{xltxtra}
+% включаем лигатуры обычного теха (например '--' создаст нам короткое тире)
+\defaultfontfeatures{Ligatures=TeX}
+
+%--------------------------- Локализация под русский язык --------------------%
+
+%\usepackage[T2A]{fontenc}			% Кодировка
+%\usepackage[utf8]{inputenc}		% Кодировка исходного текста
+\usepackage{polyglossia}            % Локализация
+\setmainlanguage{russian}
+\setotherlanguage{english}
+\setkeys{russian}{babelshorthands=true}
+\newfontfamily{\cyrillicfont}{Times New Roman}
+\newfontfamily{\cyrillicfontrm}{Times New Roman}
+\setromanfont{Times New Roman}
+%\setsansfont{Arial}
+%\setmonofont{Courier New}
+
+% Пакет fontspec вроде не работает в преамбуле, но пока оставлю
+% info: https://tex.stackexchange.com/questions/352804/setmainfont-vs-fontspec
+\usepackage{fontspec}
+\setmainfont{Times New Roman}       % Times New Roman шрифт
+
+% Переопределим названия рисунков, таблиц и содержания
+\addto\captionsrussian{%
+  \renewcommand{\figurename}{Рисунок}%
+  \renewcommand{\tablename}{Таблица}%
+}
+
+\usepackage{geometry}               % Зададим поля
+	\geometry{top=20mm}
+	\geometry{bottom=20mm}
+	\geometry{left=30mm}
+	\geometry{right=15mm}
+
+%-------------------- Настройка всяких отступов ------------------------------%
+
+\usepackage{indentfirst}            % Абзацный отступ
+\setlength{\parindent}{1.25cm}      % Отступ 1.25 см
+\usepackage{setspace}               % Интерлиньяж
+\setlength{\parskip}{.5ex}          % Разрыв между абзацами
+\onehalfspacing                     % Интерлиньяж 1.5
+%\doublespacing                     % Интерлиньяж 2
+%\singlespacing                     % Интерлиньяж 1
+
+
+%---------- Стилизация структурных элементов. разделов и подразделов ---------%
+% Для основных структурных элементов используется \part*
+% для нумерованных разделов и подразделов используется \section \subsection и тд.
+\usepackage[raggedright,explicit]{titlesec}
+\titleformat{\part}
+    {\bfseries\normalsize\centering\uppercase} % Полужирный, по центру, прописными
+    {}                              % Вставка перед названием структ. элемента
+    {1em}                           % Отступ после номера раздела
+    {#1}                            % Название раздела
+    []                              % Вставка после названия раздела
+\titlespacing*{\part}{0pt}{-30pt}{\parskip}
+
+\titleformat{\section}[block]
+    {\bfseries\normalsize}          % Полужирный
+    {\thesection}                   % Вставка перед названием структ. элемента
+    {1ex}                           % Отступ после номера раздела
+    {#1}                            % Название раздела
+    []                              % Вставка после названия раздела
+\titlespacing*{\section}{\parindent}{\parskip}{\parskip}
+
+\titleformat{\subsection}[block]
+    {\bfseries\normalsize}          % Полужирный
+    {\thesubsection}                % Вставка перед названием структ. элемента
+    {1ex}                           % Отступ после номера раздела
+    {#1}                            % Название раздела
+    []                              % Вставка после названия раздела
+\titlespacing*{\subsection}{\parindent}{\parskip}{\parskip}
+
+\titleformat{\subsubsection}[block]
+    {\normalsize}                   % Полужирный
+    {\thesubsubsection}             % Вставка перед названием структ. элемента
+    {1ex}                           % Отступ после номера раздела
+    {#1}                            % Название раздела
+    []                              % Вставка после названия раздела
+\titlespacing*{\subsubsection}{\parindent}{\parskip}{\parskip}
+
+%------------------ Стилизация СОДЕРЖАНИЯ ------------------------------------%
+
+% Самое вкусное... На что пришлось потратить большую часть времени, чтобы
+% добиться соответствия ГОСТу, поэтому оставил два решения:
+% 1) с помощью пакета titletoc, который, как я понял, хардкодит эти значения
+%    в стиль документа,
+% 2) захардкодил сам без использованя пакета.
+% А зачем использовать пакет, если можно сделать без него.
+
+% Содержание titletoc
+%\usepackage{titletoc}
+%\dottedcontents{part}[1.25cm]{}{2em}{1pc}
+%\dottedcontents{section}[1.25cm]{}{2em}{1pc}
+%\dottedcontents{subsection}[2.25cm]{}{2em}{1pc}
+%\dottedcontents{subsubsection}[1.25cm]{}{2em}{1pc}
+
+\addto\captionsrussian{\renewcommand{\contentsname}{\centering СОДЕРЖАНИЕ}}
+% -------------------------------------------------------------^^^^^^^^^^-----%
+% -------------------- похоже на хак, но элегантного решения я не нашел (>_<)-%
+
+\makeatletter
+\renewcommand{\l@part}{\@dottedtocline{1}{2ex}{2ex}}
+\renewcommand{\l@section}{\@dottedtocline{1}{2ex}{2ex}}
+\renewcommand{\l@subsection}{\@dottedtocline{1}{4ex}{4ex}}
+\renewcommand{\l@subsubsection}{\@dottedtocline{1}{6ex}{6ex}}
+\makeatother
+
+
+%------------------------ Рисунки --------------------------------------------%
+
+\usepackage{graphicx}
+% Зададим относительный путь до картинок
+\graphicspath{ {./img/} }
+% Заменим разделитель на тире и центрируем название
+\usepackage[labelsep=endash]{caption}
+% Зададим отступы слева и справа для названия картинки
+\captionsetup[figure]{justification=centering,margin=2cm}
+% Отрегулируем отступы снизу и сверху названия
+\captionsetup[figure]{belowskip=-1ex,aboveskip=1.5ex}
+
+
+%------------------------ Таблицы --------------------------------------------%
+
+%Для длинных таблиц рекомендуют использовать данный пакет
+%https://tex.stackexchange.com/questions/59309/ltablex-customize-caption
+\usepackage{ltablex}
+
+% Отображаем название таблицы слева
+\captionsetup[table]{singlelinecheck=false,justification=raggedright}
+% Уменьшим отступ после названия
+\captionsetup[table]{aboveskip=.5ex}
+
+
+%----------------------- Списки ----------------------------------------------%
+\usepackage{calc}
+\usepackage{enumitem}
+
+\setlist{
+    topsep=0pt,                   % отступ сверху и снизу списка
+    partopsep=0pt,                % то же самое
+    leftmargin=0pt,               % отступ слева
+    labelsep=0pt,                 % отступ метки
+    align=left,                   % выравнивание метки
+    listparindent=\parindent,     % отступ первой строки абзаца
+    itemsep=0pt,                  % отступ между элементами
+    parsep=0pt                    % отступ между абзацами и элементами
+}
+\setlist[itemize]{
+    label=---~,  %
+    labelwidth=1.2em,%
+    itemindent=\parindent+\labelwidth%
+}
+\setlist[enumerate]{
+    label=\arabic*),%
+    labelwidth=1.4em,%
+    itemindent=\parindent+\labelwidth%
+}
+
+% Переопределим алфавит asbuk, т.к. он использует буквы з,о и др., которые
+% по ГОСТу запрещены
+\makeatletter
+\def\asbukx#1{\expandafter\@asbukx\csname c@#1\endcsname}
+\def\@asbukx#1{\ifcase#1\or a\or б\or в\or г\or д\or е\or ж\or и\or к\or л\or м\or н\or п\or р\or с\or т\or у\or ф\or х\or ц\or ш\or щ\or э\or ю\or я\fi}
+
+\def\Asbukx#1{\expandafter\@Asbukx\csname c@#1\endcsname}
+\def\@Asbukx#1{\ifcase#1\or А\or Б\or В\or Г\or Д\or Е\or Ж\or И\or К\or Л\or М\or Н\or П\or Р\or С\or Т\or У\or Ф\or Х\or Ц\or Ш\or Щ\or Э\or Ю\or Я\fi}
+\makeatother
+
+% Создадим счетчики
+\AddEnumerateCounter{\asbukx}{\@asbukx}{7}
+\AddEnumerateCounter{\Asbukx}{\@Asbukx}{7}
+
+
+% Создадим свой лист
+\newlist{asblist}{enumerate}{2}
+\setlist[asblist]{
+    label=\asbukx*),
+    labelwidth=1.4em,
+    itemindent=\parindent+\labelwidth
+}
+
+\newlist{Asblist}{enumerate}{2}
+\setlist[Asblist]{
+    label=\Asbukx*),
+    labelwidth=1.4em,
+    itemindent=\parindent+\labelwidth
+}
+
+
+
+%---------------------- Часто встречаются данные пакеты ----------------------%
+\usepackage{amsmath}
+\usepackage{amsfonts}
+
+
+%---------------------- Библиография -----------------------------------------%
+\usepackage[style=russian]{csquotes}
+% Подключаем пакет Biblatex
+\usepackage[
+    backend=biber,%
+    sorting=none,%
+    style=gost-numeric%
+]{biblatex}
+\addbibresource{bibliography.bib}
+
+% Уберем точку после источника
+\DeclareFieldFormat{labelnumberwidth}{#1}
+
+
+%----------------------- Макросы ---------------------------------------------%
+
+% Новая команда для создания структурного элемента или раздела без добавления
+% в содержание
+% https://stackoverflow.com/questions/2785260/hide-an-entry-from-toc-in-latex
+\newcommand{\nocontentsline}[3]{}
+\newcommand{\tocless}[2]{\bgroup\let\addcontentsline=\nocontentsline#1{#2}\egroup}
+% используется так: \tocless\part{имя} или \tocless\(sub)section{имя}
+
+% Удобная вставка картинок
+% принимает аргументы: name, scale, caption, label
+\newcommand{\fig}[4]{  %
+
+    \begin{figure}[h] %
+        \centering    %
+        \includegraphics[scale=#2]{#1} %
+        \caption{#3}  %
+        \label{fig:#4}
+    \end{figure}      %
+}
+
+% Чтобы постоянно не прописывать разрыв страницы
+% создадим свою команду
+\newcommand{\structel}[1]{%
+    \clearpage%
+    \part*{#1}%
+}
+
+\newcommand{\sect}[1]{%
+    \clearpage%
+    \section{#1}%
+}
+
+\newcommand{\ssect}[1]{%
+    \subsection{#1}%
+}
+
+\newcommand{\sssect}[1]{%
+    \subsubsection{#1}%
+}
+
+% Показать библиографию
+\newcommand{\printbib}{%
+    % Нативный способ добавления в toc
+    %\printbibliography[heading=bibintoc,title={\centering СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ}]
+    % Но я предпочел сделать так
+    \printbibliography[heading=none]
+}
+
+% Команда для устранения переносов в содержании, пока не разобрался с ней
+%\newcommand{\banhyphens}{\hyphenpenalty=10000\exhyphenpenalty=10000{}}
+%\pretocmd{\tableofcontents}{\begingroup\banhyphens}{}{}
